@@ -24,7 +24,10 @@ export const registerController = async (req, res) => {
       dob,
     });
 
-    const accessToken = generateToken(newUser._id, "15min");
+    const userData = newUser.toObject();
+    delete userData.password;
+
+    const accessToken = generateToken(newUser._id, "15m");
     const refreshToken = generateToken(newUser._id, "1d");
 
     res.cookie("accessToken", accessToken, {
@@ -40,7 +43,7 @@ export const registerController = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User registered",
-      data: newUser,
+      data: userData,
     });
   } catch (error) {
     return res.status(500).json({
