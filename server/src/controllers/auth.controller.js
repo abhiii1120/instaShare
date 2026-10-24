@@ -1,10 +1,9 @@
 import userModel from "../model/user.model.js";
 import { sendEmail } from "../services/email.service.js";
 import jwt from "jsonwebtoken";
-import { generateToken } from "../../utils/token.js";
+import { generateToken } from "../shared/utils/token.js";
 
 export const registerController = async (req, res) => {
-  try {
     let { username, fullName, email, mobile, password, bio, dob } = req.body;
 
     if (!username || !email || !password || !fullName) {
@@ -45,11 +44,16 @@ export const registerController = async (req, res) => {
       message: "User registered",
       data: userData,
     });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "internal server error",
-      error: error.message,
-    });
-  }
 };
+
+export const loginController = async (req,res) => {
+  try {
+    
+  } catch (error) {
+      return res.status(500).json({
+        success:false,
+        message:"Interval Server Error",
+        error:error.message
+      })
+  }
+}
