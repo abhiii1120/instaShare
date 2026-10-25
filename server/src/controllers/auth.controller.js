@@ -99,7 +99,7 @@ export const forgotPasswordController = async (req, res) => {
 
   const resetToken = generateToken(user._id, "15m");
 
-  const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
   await sendEmail(
     user.email,
@@ -119,3 +119,24 @@ export const forgotPasswordController = async (req, res) => {
 
   BuildSuccessResponse(res, "email sent successfully");
 };
+
+export const resetPasswordController = async (req,res) => {
+  const {newPassword} = req.body;
+  const {token} = req.params;
+
+  if(!token || !newPassword) throw new BadRequest("token and new password are required");
+
+  const decoded = verifyToken(token);
+
+  if(!decoded) throw new Unauthorized("Unauthorized access");
+
+  const user = await userModel.findById(decoded.id);
+
+  if(!user) throw new Notfound("User not found");
+
+  user.password = newPassword
+  
+  await user.save()
+
+  BuildSuccessResponse(res,"Password updated successfully")
+}
