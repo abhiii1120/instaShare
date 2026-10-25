@@ -1,7 +1,6 @@
 import userModel from "../model/user.model.js";
 import { sendEmail } from "../services/email.service.js";
-import jwt from "jsonwebtoken";
-import { generateToken } from "../shared/utils/token.js";
+import { generateToken, verifyToken } from "../shared/utils/token.js";
 import BadRequest from "../shared/error/BadRequest.js";
 import Notfound from "../shared/error/NotFound.js";
 import Unauthorized from "../shared/error/Unauthorized.js";
@@ -43,7 +42,7 @@ export const loginController = async (req, res) => {
     throw new BadRequest("All fields are required");
   }
 
-  const user = await userModel.findOne({ email }).lean();
+  const user = await userModel.findOne({ email });
 
   if (!user) throw new Notfound("User not found");
 
@@ -60,4 +59,25 @@ export const loginController = async (req, res) => {
   delete userData.password;
 
   BuildSuccessResponse(res, "User Login Successfully", userData);
+};
+
+export const refreshTokenController = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    throw new Unauthorized("Unauhorized access");
+  }
+
+  const verifyRefreshToken = verifyToken(refreshToken);
+
+  const user = await userModel.findById(verifyRefreshToken.id);
+
+  if (!user) {
+    throw new Notfound("User not found");
+  }
+
+  const accessToken = generateToken(user._id, "15m");
+
+  setAuthCookies(res, accessToken, null);
+
+  BuildSuccessResponse(res, "access token generated successfully");
 };
