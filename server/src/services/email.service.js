@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
@@ -20,6 +21,8 @@ transporter.verify((error) => {
 })
 
 export const sendEmail = async (to,subject,text,html) => {
+        console.log(!!process.env.GOOGLE_USER, !!process.env.GOOGLE_CLIENT_ID, !!process.env.GOOGLE_CLIENT_SECRET, !!process.env.GOOGLE_REFRESH_TOKEN)
+    // console.log(to,subject,text,html)
     try {
         const info = await transporter.sendMail({
             from:`"Insta Share <${process.env.GOOGLE_USER}>"`,

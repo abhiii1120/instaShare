@@ -81,3 +81,41 @@ export const refreshTokenController = async (req, res) => {
 
   BuildSuccessResponse(res, "access token generated successfully");
 };
+
+export const forgotPasswordController = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new BadRequest("email is required");
+  }
+
+  const user = await userModel.findOne({ email });
+
+  if (!user) {
+    throw new Notfound("user not found");
+  }
+
+  console.log(user)
+
+  const resetToken = generateToken(user._id, "15m");
+
+  const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
+
+  await sendEmail(
+    user.email,
+    "Reset your InstaShare Password",
+    `Reset your password using this link: ${resetUrl}`,
+    `
+      <h2>Reset your password</h2>
+      <p>Click the button below to reset your password.</p>
+
+      <a href="${resetUrl}">
+        Reset password
+      </a>
+
+      <p>This link expires in 10 minutes.</p>
+    `,
+  );
+
+  BuildSuccessResponse(res, "email sent successfully");
+};
