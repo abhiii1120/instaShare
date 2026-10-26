@@ -1,36 +1,26 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-import jwt from 'jsonwebtoken';
-import userModel from '../model/user.model.js';
+import jwt from "jsonwebtoken";
+import userModel from "../model/user.model.js";
+import Notfound from "../shared/error/NotFound.js";
+import Unauthorized from "../shared/error/Unauthorized.js";
+import { asyncHandler } from "./asyncHandler.js";
 
-export const authMiddleware = async (req,res,next) => {
-    try{
-        let token = req.cookies.accessToken;
+export const authMiddleware = asyncHandler(async (req, res, next) => {
+  let token = req.cookies.accessToken;
 
-        if(!token){
-            return res.status(404).json({
-                success:false,
-                message:"Token not found",
-            });
-        }
+  if (!token) {
+    throw new Notfound("Token not found");
+  }
 
-        let decode = jwt.verify(token,process.env.JWT_SECRET);
+  let decode = jwt.verify(token, process.env.JWT_SECRET);
 
-        if(!decode){
-            return res.status(401).json({
-                success:false,
-                message:"Unauthorized access"
-            })
-        }
+  if (!decode) {
+    throw new Unauthorized("Unauthorized access");
+  }
 
-        let user = await userModel.findById(decode.id).select("-password");
+  let user = await userModel.findById(decode.id).select("-password");
 
-        req.user = user;
-        next();
-    }catch(error){
-        return res.status(500).json({
-            success:false,
-            message:"Validation error",
-        })
-    }
-}
+  req.user = user;
+  next();
+});
