@@ -46,7 +46,7 @@ export const loginController = async (req, res) => {
 
   if (!user) throw new Notfound("User not found");
 
-  const isPasswordCorrect = user.comparePass(password);
+  const isPasswordCorrect = await user.comparePass(password);
 
   if (!isPasswordCorrect) throw new Unauthorized("Invalid credentials");
 

@@ -25,13 +25,13 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Username is required"],
-      ...commonTypes,
+      required: [true, "Password is required"],
       minlength: 8,
     },
     mobile: {
       type: String,
-      ...commonTypes,
+      sparse: true,
+      trim: true,
       minlength: 10,
       maxlength: 30,
     },
@@ -98,8 +98,8 @@ userSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.methods.comparePass = function (password){
-    return bcrypt.compare(password,this.password);
+userSchema.methods.comparePass = async function (password) {
+  return bcrypt.compare(password, this.password);
 };
 
 const userModel = mongoose.model("users",userSchema);
