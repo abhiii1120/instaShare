@@ -37,3 +37,17 @@ export const createPost = async (req, res) => {
 
   BuildSuccessResponse(res, "post created successfully", post);
 };
+
+export const gellAllPost = async (req,res) => {
+
+}
+
+export const updatePost = async (req,res) => {
+  const postId = req.params.id
+
+  if(!postId) throw new BadRequest("post id is required");
+
+  if(!req.body) throw new BadRequest("caption is needed");
+
+  
+}
